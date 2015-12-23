@@ -10,6 +10,7 @@ Download Columnizer and import it in your HTML.
 
 Launch Columnizer by a simple statement:
 document.getElementById('from').dbabych_columnize(params);
+
   where:
   *document.getElementById('from')* — block, containing HTML to be split into columns
   *params* — object with parameters
