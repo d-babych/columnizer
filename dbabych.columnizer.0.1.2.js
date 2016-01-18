@@ -65,7 +65,7 @@ Element.prototype.dbabych_columnize = function(options) {
 
 		// Creating temporary block to contain newly created column
 		this.debug = document.createElement('div');
-		// Добавляем промежуточный блок в конечный блок, чтобы учесть наследование стилей при разбиении
+		// Adding temporary block to the final container to include style inheritance during work of columnizer
 		this.to.appendChild(this.debug);
 		// Задаем ширину промежуточного блока для вычисления высоты новой колонки
 		this.debug.style.width = this.params.width + 'px';
