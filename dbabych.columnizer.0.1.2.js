@@ -67,31 +67,31 @@ Element.prototype.dbabych_columnize = function(options) {
 		this.debug = document.createElement('div');
 		// Adding temporary block to the final container to include style inheritance during work of columnizer
 		this.to.appendChild(this.debug);
-		// Задаем ширину промежуточного блока для вычисления высоты новой колонки
+		// Setting up width of the temnporary block to calculate the height of the new column
 		this.debug.style.width = this.params.width + 'px';
-		// Тип inline-block нужен для того, чтобы исключить влияние отступов margin внутренних блоков на вычисляемую высоту очередной колонки
+		// 'inline-block' type is needed to exclude influence of margins of the inner blocks on the calculated height of the new column
 		this.debug.style.display = 'inline-block';
 		this.debug.style.verticalAlign = 'top';
-		// Дополнительный класс, который используется в ЗиБе
+		// Additional class, that can be used to add pre-set styles to column
 		this.debug.className = this.params.col_class;
 	}
 
 
 	Element.prototype.columnize_close = function() {
-		// Функция выполняет удаление созданных ДОМ-элементов после завершения работы колумнайзера
+		// Function deletes created DOM-elements after Columnizer has finished its work
 
-		// Удаляем промежуточный блок
+		// Delete temporary block
 		this.to.removeChild(this.debug);
 
-		// Удаляем копию источника
+		// Delete source copy
 		//document.removeChild(this.from_clone);
 	}
 
 
 	Element.prototype.columnize_cycle = function() {
-		// Функция циклично выполняет дробление на колонки исходного блока
+		// Function splits initial block to columns in cycle
 
-		// Запускаем цикл разбиения HTML-верстки на колонки
+		// Start cycle of splitting HTML-markup to columns
 		while (this.from_clone.childNodes.length > 0) {
 			this.columnize_node(this.from_clone, this.debug, this.debug);
 			this.save_column();
@@ -100,7 +100,7 @@ Element.prototype.dbabych_columnize = function(options) {
 
 
 	Element.prototype.save_column = function() {
-		// Функция переносит накопленный в промежуточном блоке HTML во вновь созданную колонку в целевом блоке
+		// Function moves contents of temporary block to the newly created column in the final container
 
 		var clone = document.createElement("div");
 		clone.innerHTML = this.debug.innerHTML;
@@ -116,7 +116,7 @@ Element.prototype.dbabych_columnize = function(options) {
 
 
 	Element.prototype.get_offsetHeight = function() {
-		// Функция возвращает высоту элемента в пикселях
+		// Function returns height of element in pixels
 
 		var height = this.offsetHeight;
 		return height;
@@ -124,170 +124,167 @@ Element.prototype.dbabych_columnize = function(options) {
 
 
 	Element.prototype.columnize_node = function(from, to, debug) {
-		// Функция выполняет перенос содержимого из from в to, учитывая, что debug - блок, через который определяется высота
-		// очередной колонки
+		// Function moves contents from 'from' to 'to', considering that 'debug' is a block, through which the height of new column is calculated
 		//
-		// Параметры:
-		// from  - DOM-узел, дочерние узлы которого сканирует функция
-		// to    - DOM-узел, в который функция переносит содержимое из from
-		// debug - DOM-узел, содержимое которого является содержимым новой создаваемой колонки
+		// Parameters:
+		// from  - DOM-element, child nodes of which are scanned by the function
+		// to    - DOM-element, where the function moves contents to from 'from'
+		// debug - DOM-element, contents of which is considered to be the contents of the newly created column
 		//
-		// result - результат выполнения функции
-		// значения: 0 - скопировать узлы не получилось вообще
-		//           1 - получилось скопировать часть узлов
+		// result - the result of function execution
+		// values: 0 - cannot copy nodes at all
+		//         1 - some nodes where copied successfully
 		var result = 0;
-		// Флаг, который является признаком того, что перенесенный первый узел был удален
+		// Flag, showing that the moved first node was deleted
 		var removed_first = 0;
 		while (from.childNodes.length > 0) {
-			// Перебираем все узлы из указанного узла
+			// Iterating through all the children from the selected element
 		    if (from.firstChild.nodeType == document.ELEMENT_NODE || from.firstChild.nodeType == document.TEXT_NODE) {
 				if (from.firstChild.nodeType == document.TEXT_NODE) {
-					// Если первый узел представляет с собой текст - проверяем, является ли первый узел пробельным символом
+					// If the first node is text - check, whether it is a 'space' symbol
 					var node_text = encodeURIComponent(from.firstChild.nodeValue);
 					node_text = node_text.replace(/%0A/, '').replace(/%09/, '').replace(/%20/, '');
 					if (node_text == '') {
-						// Удаляем первый пробельный узел
+						// Deleting the first 'space' symbol
 						from.removeChild(from.firstChild);
-						// Переходим к следующей итерации
+						// Go to the next iteration
 						continue;
 					}
 				}
-				// Пытаемся скопировать весь узел целиком
+				// Trying to clone the whole node
 				var clone = from.firstChild.cloneNode(true);
 				to.appendChild(clone);
-				// Принудительно устанавливаем настройки для первого по счету узла в колонке
+				// Forcibly setting parameters for the first node in the column
 				if (to === debug) {
-					// Определяем, что мы имеем дело с корневым узлом
+					// Detecting that we deal with the root node
 					if (to.firstChild.nodeType == document.ELEMENT_NODE) {
-						// Если первый узел представляет с собой тег - обрабатываем его как тег
+						// If the forst node is tag - processing it as tag
 						if (to.firstChild.nodeName == 'BR') {
-							// Проверяем, является ли первый узел переводом строки
-							// Удаляем первый узел, перенесенный в промежуточный блок
+							// Detect, whether to first node is a 'break' tag
+							// Remove the first node, moved to the temporary block
 							to.removeChild(to.firstChild);
-							// Запоминаем, что первый узел, перенесенный в промежуточный блок, был удален в итоге
+							// Remembering, that the first node, moved to the temporary block, was removed
 							removed_first = 1;
 						} else {
-							// Устанавливаем отступ сверху равный нулю
+							// Setting the top offset to zero
 							to.firstChild.style.marginTop = '0px';
 							to.firstChild.style.paddingTop = '0px';
 						}
 					}
 				}
 				if (debug.get_offsetHeight() > this.params.height) {
-					// Если целиком узел не влазит - пытаемся решить вопрос по-другому
-					// Удаляем скопированный ранее узел
+					// If the whole node doesn't fit - trying to fulfill the task in the other way
+					// Deleting the previously copied node
 					to.removeChild(to.lastChild);
-					// Проверяем тип обрабатываемого узла
+					// Checking the type of the processing node
 					if (from.firstChild.nodeType == document.ELEMENT_NODE) {
-						// Если узел - ХТМЛ-тег, то обрабатываем его как ХТМЛ-тег
+						// If node is HTML-tag - processing it as HTML-tag
 						var node_name = from.firstChild.nodeName;
 						if (node_name != 'H1' && node_name != 'H2' && node_name != 'H3' && node_name != 'H4' && node_name != 'H5' && node_name != 'H6') {
-							// Обрабатываем узел по частям только если он является заголовком
-							// Копируем узел повторно, но оставляем его пустым, чтобы затем наполнять постепенно
+							// Processing node by parts only if it is not a header
+							// Copying node again, but leaving it hollow to fill it by parts later
 							var clone = from.firstChild.cloneNode(true);
 							if (clone.innerHTML != '') {
 								clone.innerHTML = "";
 							}
 							to.appendChild(clone);
-							// Принудительно устанавливаем настройки для последнего по счету узла в колонке
+							// Forcibly setting parameters for the last node in the column
 							if (to === debug) {
 								if (to.lastChild.nodeType == document.ELEMENT_NODE) {
-									// Устанавливаем отступ снизу равный нулю
+									// Setting bottom offset to zero
 									to.lastChild.style.marginBottom = '0px';
 									to.lastChild.style.paddingBottom = '0px';
 								}
 							}
-							// Запускаем попытку копирования узла по частям
+							// Starting attempt to copy node by parts
 							result_inline = this.columnize_node(from.firstChild, to.lastChild, debug);
 							if (result_inline == 0) {
-								// Если в результате попытки переноса внутренностей узла ничего не изменилось - удаляем пустую копию узла
+								// If after attempt to move node's contents nothing has changed - delete the hollow copy of node
 								to.removeChild(to.lastChild);
 							}
 							if (result == 0) {
-								// Если до сих пор мы не перенесли ни одного узла - присваем результат переноса внутренностей текущего узла
+								// If after all we have not managed to move any node - setting result to the result of moving node's contents
 								result = result_inline;
 							}
 						}
-						// Поскольку текущий узел перенести не удалось, то после его обработки и обработки его внутренностей
-						// мы прекращаем выполнение цикла
+						// Because we have not managed to move current node, we stop processing cycle after finish processing the node and it's contents
 						break;
 					} else if (from.firstChild.nodeType == document.TEXT_NODE) {
-						// Если узел - Текст, то обрабатываем его как Текст
-						// Разбиваем текстовый узел на массив, состоящий из слов
+						// If the node is text, than processing it as a text
+						// Split the text into an array of words
 						text_array = from.firstChild.nodeValue.split(" ");
 						for (i = text_array.length - 1; i > 0; i--) {
-							// Циклически пытаемся заполнить новый блок текстом, постепенно уменьшая оригинальный на одно слово
-							// Создаем строку с текстом переноса для очередной попытки
+							// Attempting cyclically fill in new block with text, step-by-step removing the original one by single word
+							// Creating string with the moving text for the next attempt
 							text_new = text_array.slice(0, i).join(" ");
-							// Добавляем в новый блок узел с созданным текстом
+							// Adding the node with created text to the new block
 							var clone = document.createTextNode(text_new);
 							to.appendChild(clone);
-							// Проверяем высоту нового блока
+							// Checking height of the new block
 							if (debug.get_offsetHeight() > this.params.height) {
-								// Если высота блока превысила допустимый размер - удаляем перенесенный текст
+								// If the height if more than allowable value - deleting moved text
 								to.removeChild(to.lastChild);
 							} else {
-								// Устанавливаем результат переноса узлов в единицу
+								// Setting the result of the movement to 1
 								result = 1;
-								// Обрезаем текст в исходном блоке на размер текста, который мы перенесли в новый блок
+								// Cutting text in the source block by the size of the text, moved to the new block
 								from.firstChild.nodeValue = text_array.slice(i, text_array.length).join(" ");
-								// Прерываем выполнение функции, поскольку максимальный по размеру текст перенесли
+								// Breaking the function execution, because the maximum length of text is moved already
 								break;
 							}
 						}
-						// Поскольку текущий узел перенести не удалось, то после его обработки и обработки его внутренностей
-						// мы прекращаем выполнение цикла
+						// Because the current node was not moved, we stop executing the cycle after finish processing the node and its contents
 						break;
 					}
 				} else {
-					// Если узел влез целиком - идем дальше
-					// Удаляем этот узел из исходного блока
+					// If the node was moved entirely - go further
+					// Deleting the node from the source block
 					from.removeChild(from.firstChild);
 					if (removed_first == 0) {
-						// Если текущий узел не был удален
-						// Запоминаем результат выполнения: что был перенесен по крайней мере один узел
+						// if the current node was not deleted
+						// Memorizing the result: that at least one node was moved successfully
 						result = 1;
 					} else {
-						// Если текущий узел был удален
-						// Результат выполнения не меняем и сбрасываем флаг первого узла в ноль
+						// If the current node was deleted
+						// Do not change the result of execution and setting the first element flag to zero
 						removed_first = 0;
 					}
 				}
 		    } else {
-				// Если тип узла не Тег и не Текст - удаляем его, чтобы не мешал сканировать
+				// If node's type is not Tag or Text - deleting it, not to interfere in the process
 				from.removeChild(from.firstChild);
 			}
 		}
-		// Завершающая проверка на то, чтобы последним элементом в колонке не оставался заголовок
+		// Finalizing check to avoid leaving header as the last element in the column
 		if (to.lastChild != null) {
-			// Если последний элемент определен - проверяем его
+			// If the last element is defined - checking it
 			if (to.lastChild.nodeType == document.ELEMENT_NODE) {
-				// Если последний элемент является тегом - обрабатываем его
-				// Определяем наименование тега
+				// If the last node is tag - processing it
+				// Detecting the tag name
 				var node_name = to.lastChild.nodeName;
 				if (node_name == 'H1' || node_name == 'H2' || node_name == 'H3' || node_name == 'H4' || node_name == 'H5' || node_name == 'H6') {
-					// Если имеем дело с заголовком - переносим его обратно в исходный блок
+					// If we are dealing with the header - moving it back to the source block
 					var clone = to.lastChild.cloneNode(true);
 					from.insertBefore(clone, from.firstChild);
 					to.removeChild(to.lastChild);
 				}
 			}
 		}
-		// Возвращаем результат выполнения функции
+		// Returning the result of function execution
 		return result;
 	}
 
 
 
-	// Инициализируем колумнайзер
+	// Initializing Columnnizer
 	this.columnize_init();
 
-	// Запускаем функцию разбиения на колонки
+	// Start columnizing function
 	this.columnize_cycle();
 
-	// Завершаем выполнение колумнайзера
+	// Ending Columnizer execution
 	this.columnize_close();
 
-	// Запускаем функцию по окончанию разбиения на колонки
+	// Executing user function after the end of Columnizer execution
 	this.params.done_func();
 }
