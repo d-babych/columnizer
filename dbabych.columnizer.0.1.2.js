@@ -21,9 +21,9 @@ Element.prototype.dbabych_columnize = function(options) {
 		// Container to insert resulted columns in
 		target : document.getElementById('to')
 	};
-	
+
 	this.params = this.defaults;
-	
+
 	if (options !== undefined) {
 		if (options.width !== undefined) {
 			this.params.width = options.width;
@@ -47,23 +47,23 @@ Element.prototype.dbabych_columnize = function(options) {
 
 
 	Element.prototype.columnize_init = function() {
-		// Функция производит инициализацию колумнайзера:
-		// - устанавливает значения по умолчанию
-		// - определяет нужные константы
-		// - инициализирует нужные переменные
-		// - создает элементы ДОМ-модели, необходимые для работы
-		
-		// Устанавливаем константы по умолчанию - определены не во всех браузерах
+		// Function inits Columnizer:
+		// - sets up defaut values
+		// - sets up constants
+		// - defines variables
+		// - creates DOM elements, needed for work
+
+		// Defining default constants - not present in all browsers
 		document.ELEMENT_NODE = 1;
 		document.TEXT_NODE = 3;
-	
-		// Копируем оригинальный источник HTML-верстки
+
+		// Copying original HTML-markup source
 		this.from_clone = document.createElement("div");
 		this.from_clone.innerHTML = this.innerHTML;
 		this.to = this.params.target;
 		this.to.innerHTML = '';
-		
-		// Создаем промежуточный блок для формирования очередной колонки
+
+		// Creating temporary block to contain newly created column
 		this.debug = document.createElement('div');
 		// Добавляем промежуточный блок в конечный блок, чтобы учесть наследование стилей при разбиении
 		this.to.appendChild(this.debug);
@@ -79,10 +79,10 @@ Element.prototype.dbabych_columnize = function(options) {
 
 	Element.prototype.columnize_close = function() {
 		// Функция выполняет удаление созданных ДОМ-элементов после завершения работы колумнайзера
-		
+
 		// Удаляем промежуточный блок
 		this.to.removeChild(this.debug);
-		
+
 		// Удаляем копию источника
 		//document.removeChild(this.from_clone);
 	}
@@ -90,18 +90,18 @@ Element.prototype.dbabych_columnize = function(options) {
 
 	Element.prototype.columnize_cycle = function() {
 		// Функция циклично выполняет дробление на колонки исходного блока
-		
+
 		// Запускаем цикл разбиения HTML-верстки на колонки
 		while (this.from_clone.childNodes.length > 0) {
 			this.columnize_node(this.from_clone, this.debug, this.debug);
 			this.save_column();
 		}
 	}
-	
-	
+
+
 	Element.prototype.save_column = function() {
 		// Функция переносит накопленный в промежуточном блоке HTML во вновь созданную колонку в целевом блоке
-		
+
 		var clone = document.createElement("div");
 		clone.innerHTML = this.debug.innerHTML;
 		clone.style.display = 'inline-block';
@@ -113,18 +113,18 @@ Element.prototype.dbabych_columnize = function(options) {
 		this.to.appendChild(clone);
 		this.debug.innerHTML = '';
 	}
-	
-	
+
+
 	Element.prototype.get_offsetHeight = function() {
 		// Функция возвращает высоту элемента в пикселях
-		
+
 		var height = this.offsetHeight;
 		return height;
 	}
-	
-	
+
+
 	Element.prototype.columnize_node = function(from, to, debug) {
-		// Функция выполняет перенос содержимого из from в to, учитывая, что debug - блок, через который определяется высота 
+		// Функция выполняет перенос содержимого из from в to, учитывая, что debug - блок, через который определяется высота
 		// очередной колонки
 		//
 		// Параметры:
@@ -291,4 +291,3 @@ Element.prototype.dbabych_columnize = function(options) {
 	// Запускаем функцию по окончанию разбиения на колонки
 	this.params.done_func();
 }
-
